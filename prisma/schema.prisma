@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Post {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  title String
+  content String
+  publish Boolean @default(false)
+  authorId String?
+  author User? @relation(fields: [authorId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  postCategory PostCategory[]
+
+  @@map("posts")
+}
+
+model User {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  username String @unique 
+  age Int @default(0)
+  email String
+  role UserRole @default(user)
+  profile Profile? // one to one relation
+  post Post[] // one to many relatio
+
+  @@map("users")
+}
+
+model Profile {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  bio String?
+  userId String @unique
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("profiles")
+}
+
+model Category {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+  postCategory PostCategory[]
+
+  @@map("categories")
+}
+
+model PostCategory {
+  id String @id @default(auto()) @map("_id") @db.ObjectId 
+  postId String @db.ObjectId
+  post Post @relation(fields: [postId], references: [id])
+  categoryId String @db.ObjectId
+  category Category @relation(fields: [categoryId], references: [id])
+
+  @@map("post_category")
+}
+
+enum UserRole {
+  user
+  admin
+}
