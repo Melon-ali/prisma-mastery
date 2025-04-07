@@ -17,7 +17,7 @@ const aggregates = async() => {
     const countAge = await prisma.user.aggregate({
         _count: {
             age: true
-        }
+        },
     })
 
     // find number of records
